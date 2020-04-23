@@ -7,6 +7,26 @@
 
 """
 
+def get_hold_times(qor_report):
+    """
+        Function to get worst hold time violations
+        for each clock group.
+
+        input: qor_report - text file containing contents 
+                            to search for. 
+        output: hold_times - times taken from report.
+    """
+    hold_times = []
+    for line in qor_report:
+        rtn = line.find('Total Hold Violation:')
+        if(rtn != -1):
+            line = line.strip('Total Hold Violation:')
+            line = line.strip()
+            hold_times.append(line)
+
+    return hold_times
+
+
 def get_timing_paths(qor_report):
     """
         Function to parse and get all timing paths in the QOR report.
@@ -28,6 +48,43 @@ def get_timing_paths(qor_report):
 
     return timing_paths
 
+
+def get_tns(qor_report):
+    """
+        Function to get all total negative slack times in QOR.
+
+        input: qor_report - list containing lines of file.
+        output: tns_times - list containing times from file.
+    """
+    tns_times = []
+    for line in qor_report:
+        rtn = line.find('Total Negative Slack:')
+        if rtn != -1:
+            line = line.strip('Total Negative Slack:')
+            line = line.strip()
+            tns_times.append(line)
+
+    return tns_times
+
+
+def get_wns(qor_report):
+    """
+        Function to get all worst negative slack times from QOR.
+
+        input: qor_report - list containing lines of file.
+        output: wns_times - slack times.
+    """
+    wns_times = []
+    for line in qor_report:
+        rtn = line.find('Critical Path Slack:')
+        if rtn != -1:
+            line = line.strip('Critical Path Slack:')
+            line = line.strip()
+            wns_times.append(line)
+
+    return wns_times
+
+
 def read_file(file_path):
     """
         Function to read file and return the whole file.
@@ -47,7 +104,10 @@ def main():
     file_path = "ORCA_TOP.cts2.qor.rpt"
     qor_report = read_file(file_path)
     timing_paths = get_timing_paths(qor_report)
-    print(timing_paths)
+    wns_times = get_wns(qor_report)
+    tns_times = get_tns(qor_report)
+    hold_times = get_hold_times(qor_report)
+    print(hold_times)
 
 
 
