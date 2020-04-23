@@ -9,6 +9,12 @@
 
 import glob
 
+num_hold_violation_str = 'No. of Hold Violations:'
+total_hold_violation_str = 'Total Hold Violation:'
+total_neg_slack_str = 'Total Negative Slack:'
+wns_str = 'Critical Path Slack:'
+
+
 def get_hold_times(qor_report):
     """
         Function to get worst hold time violations
@@ -20,13 +26,33 @@ def get_hold_times(qor_report):
     """
     hold_times = []
     for line in qor_report:
-        rtn = line.find('Total Hold Violation:')
-        if(rtn != -1):
-            line = line.strip('Total Hold Violation:')
+        rtn = line.find(total_hold_violation_str)
+        if rtn != -1:
+            line = line.strip(total_hold_violation_str)
             line = line.strip()
             hold_times.append(line)
 
     return hold_times
+
+
+def get_num_hold_violations(qor_report):
+    """
+        Function to get number of hold violations 
+        for each clock path.
+
+        input: qor_report - text file containing contents
+                            to search for.
+        output: num_hold_violations - list containing all hold violations.
+    """
+    num_hold_violations = []
+    for line in qor_report:
+        rtn = line.find(num_hold_violation_str)
+        if rtn != -1:
+            line = line.strip(num_hold_violation_str)
+            line = line.strip()
+            num_hold_violations.append(line)
+
+    return num_hold_violations
 
 
 def get_timing_paths(qor_report):
@@ -60,9 +86,9 @@ def get_tns(qor_report):
     """
     tns_times = []
     for line in qor_report:
-        rtn = line.find('Total Negative Slack:')
+        rtn = line.find(total_neg_slack_str)
         if rtn != -1:
-            line = line.strip('Total Negative Slack:')
+            line = line.strip(total_neg_slack_str)
             line = line.strip()
             tns_times.append(line)
 
@@ -78,9 +104,9 @@ def get_wns(qor_report):
     """
     wns_times = []
     for line in qor_report:
-        rtn = line.find('Critical Path Slack:')
+        rtn = line.find(wns_str)
         if rtn != -1:
-            line = line.strip('Critical Path Slack:')
+            line = line.strip(wns_str)
             line = line.strip()
             wns_times.append(line)
 
@@ -101,16 +127,15 @@ def read_file(file_path):
 
 
 def main():
-    print("Starting QOR parser.")
-
     for file_path in glob.glob("*qor*.rpt"):
-        print(file_path)
+        print("Parsing file " + file_path)
         qor_report = read_file(file_path)
         timing_paths = get_timing_paths(qor_report)
         wns_times = get_wns(qor_report)
         tns_times = get_tns(qor_report)
         hold_times = get_hold_times(qor_report)
-        print(hold_times)
+        num_hold_violations = get_num_hold_violations(qor_report)
+        print(num_hold_violations)
 
 
 
