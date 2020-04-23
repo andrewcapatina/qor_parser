@@ -7,6 +7,8 @@
 
 """
 
+import glob
+
 def get_hold_times(qor_report):
     """
         Function to get worst hold time violations
@@ -101,13 +103,14 @@ def read_file(file_path):
 def main():
     print("Starting QOR parser.")
 
-    file_path = "ORCA_TOP.cts2.qor.rpt"
-    qor_report = read_file(file_path)
-    timing_paths = get_timing_paths(qor_report)
-    wns_times = get_wns(qor_report)
-    tns_times = get_tns(qor_report)
-    hold_times = get_hold_times(qor_report)
-    print(hold_times)
+    for file_path in glob.glob("*qor*.rpt"):
+        print(file_path)
+        qor_report = read_file(file_path)
+        timing_paths = get_timing_paths(qor_report)
+        wns_times = get_wns(qor_report)
+        tns_times = get_tns(qor_report)
+        hold_times = get_hold_times(qor_report)
+        print(hold_times)
 
 
 
