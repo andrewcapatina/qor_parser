@@ -12,6 +12,7 @@ import csv
 # Update the below global variables if qor.rpt or clock_qor.rpt
 # file reporting format changes. 
 
+design_str = "Design :"
 hold_violation_str = "Worst Hold Violation:"
 total_hold_violation_str = 'Total Hold Violation:'
 total_neg_slack_str = 'Total Negative Slack:'
@@ -21,6 +22,22 @@ wns_str = 'Critical Path Slack:'
 column_labels_clock_qor = ['Clock/Skew Group', 'Attrs', 'Sinks', 'Levels', 'Clock Repeater Count',
                             'Clock Repeater Area', 'Clock Stdcell Area', 'Max Latency',
                             'Global Skew', 'Trans DRC Count', 'Cap DRC Count']
+
+
+def get_design(qor_report):
+    """
+        Function to get the current design being tested.
+    """
+    for line in qor_report:
+        rtn = line.find(design_str)
+        if rtn != -1:
+            line = line.strip(design_str)
+            line = line.strip()
+            line = line.split()
+            design = line
+
+    return design
+
 
 def get_hold_times(qor_report):
     """
@@ -119,18 +136,21 @@ def parse_clock_qor(qor_report):
     clocks = []
     for line in qor_report:
         rtn = line.find('CLK')
+        if rtn != -1:
+            clocks.append(line)
         rtn_2 = line.find('Summary Table for')
         if rtn_2 != -1:
             line = line.strip()
             line = line.strip("=")
             clocks.append(line)
-        if rtn != -1:
+        rtn_3 = line.find(design_str)
+        if rtn_3 != -1:
             clocks.append(line)
         
     clock_qor = []
     for clock in clocks:
         clock = clock.split()
-        if(len(clock) > 3): # This is done to filter out unneeded elements of list.
+        if(len(clock) > 3 or clock[0].find(design_str)): # This is done to filter out unneeded elements of list.
             clock_qor.append(clock)
     
     return clock_qor
@@ -148,7 +168,7 @@ def read_file(file_path):
     return qor_report
 
 
-def write_to_csv(file_path, reports):
+def write_qor_to_csv(file_path, reports):
     """
         Function to write the argument in a CSV file.
         input: print_row: list of lists containing timing and header information.
@@ -161,10 +181,12 @@ def write_to_csv(file_path, reports):
 
 
 def main():
-    for file_path in glob.glob("*.qor.rpt"):
+    top_design = input("Please specify a top design. String only.")
+    for file_path in glob.glob(top_design + ".*.qor.rpt"):
 
         print("Parsing file " + file_path)
         qor_report = read_file(file_path)
+        design = get_design(qor_report)
         timing_paths = get_timing_paths(qor_report)
         wns_times = get_wns(qor_report)
         tns_times = get_tns(qor_report)
@@ -176,10 +198,10 @@ def main():
         tns_times.insert(0, total_neg_slack_str)
         worst_hold_vio.insert(0, hold_violation_str)
         hold_times.insert(0, total_hold_violation_str)
-        report_qor = [timing_paths, wns_times, tns_times, 
+        report_qor = [design,timing_paths, wns_times, tns_times, 
                      worst_hold_vio, hold_times]
         
-    for file_path in glob.glob("*clock_qor.rpt"):
+    for file_path in glob.glob(top_design + ".*.clock_qor.rpt"):
         print("Parsing file " + file_path)
         qor_report = []
         qor_report = read_file(file_path)
@@ -187,7 +209,7 @@ def main():
         clock_qor.insert(1, column_labels_clock_qor)
 
     print_row = [report_qor,clock_qor]
-    write_to_csv(file_path, print_row)
+    write_qor_to_csv(file_path, print_row)
 
 
 if __name__ == "__main__":

@@ -3,13 +3,14 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>c0d99d9d-d052-4bfe-97c0-87f78353db10</ProjectGuid>
-    <ProjectHome>.</ProjectHome>
-    <StartupFile>qor_parser.py</StartupFile>
+    <ProjectHome>
+    </ProjectHome>
+    <StartupFile>report_parser_asic.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
-    <Name>qor_parser</Name>
+    <Name>report_parser_asic</Name>
     <RootNamespace>qor_parser</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
@@ -21,7 +22,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="qor_parser.py" />
+    <Compile Include="report_parser_asic.py" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="ORCA_TOP.cts2.qor.rpt" />
