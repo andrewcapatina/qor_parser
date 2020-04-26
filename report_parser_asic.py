@@ -11,8 +11,6 @@ import csv
 
 # Update the below global variables if qor.rpt or clock_qor.rpt
 # file reporting format changes. 
-
-design_str = "Design :"
 hold_violation_str = "Worst Hold Violation:"
 total_hold_violation_str = 'Total Hold Violation:'
 total_neg_slack_str = 'Total Negative Slack:'
@@ -143,14 +141,11 @@ def parse_clock_qor(qor_report):
             line = line.strip()
             line = line.strip("=")
             clocks.append(line)
-        rtn_3 = line.find(design_str)
-        if rtn_3 != -1:
-            clocks.append(line)
         
     clock_qor = []
     for clock in clocks:
         clock = clock.split()
-        if(len(clock) > 3 or clock[0].find(design_str)): # This is done to filter out unneeded elements of list.
+        if(len(clock) > 3): # This is done to filter out unneeded elements of list.
             clock_qor.append(clock)
     
     return clock_qor
@@ -186,7 +181,6 @@ def main():
 
         print("Parsing file " + file_path)
         qor_report = read_file(file_path)
-        design = get_design(qor_report)
         timing_paths = get_timing_paths(qor_report)
         wns_times = get_wns(qor_report)
         tns_times = get_tns(qor_report)
@@ -198,7 +192,7 @@ def main():
         tns_times.insert(0, total_neg_slack_str)
         worst_hold_vio.insert(0, hold_violation_str)
         hold_times.insert(0, total_hold_violation_str)
-        report_qor = [design,timing_paths, wns_times, tns_times, 
+        report_qor = [timing_paths, wns_times, tns_times, 
                      worst_hold_vio, hold_times]
         
     for file_path in glob.glob(top_design + ".*.clock_qor.rpt"):
