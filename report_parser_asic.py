@@ -137,12 +137,7 @@ def parse_clock_qor(qor_report):
         rtn = line.find('CLK')
         if rtn != -1:
             clocks.append(line)
-        rtn_2 = line.find('Summary Table for')
-        if rtn_2 != -1:
-            line = line.strip()
-            line = line.strip("=")
-            clocks.append(line)
-        
+       
     clock_qor = []
     for clock in clocks:
         clock = clock.split()
@@ -177,6 +172,22 @@ def write_qor_to_csv(file_path, reports):
             for row in report:
                 qor_writer.writerow(row)
 
+def format_clock_qor_data(clock_qor, timing_paths):
+    """
+
+    """
+    output = []
+    flag = False
+    for timing_path in timing_paths:
+        for row in clock_qor:
+            if row[0] == timing_path:
+                output.append(row)
+                flag = True
+        if flag == False:
+            output.append(['-'])
+        flag = False
+    return output
+
 def main():
     top_design = input("Please specify a top design. String only.\n")
    
@@ -194,12 +205,12 @@ def main():
         hold_times = get_hold_times(qor_report)
 
 
-#        to_open = top_design + "." + stage + ".clock_qor.rpt"
-#        print("Parsing file " + to_open)
-#        clock_qor = read_file(to_open)
-#        clock_qor = parse_clock_qor(clock_qor)
-#        clock_qor.insert(1, column_labels_clock_qor)
-#       print(pd.DataFrame(clock_qor))
+        to_open = top_design + "." + stage + ".clock_qor.rpt"
+        print("Parsing file " + to_open)
+        clock_qor = read_file(to_open)
+        clock_qor = parse_clock_qor(clock_qor)
+
+        clock_qor = format_clock_qor_data(clock_qor, timing_paths)
 
         current_stage = ["Stage: " + stage]
         timing_paths.insert(0, " ")
@@ -207,9 +218,15 @@ def main():
         tns_times.insert(0, "TNS Setup.")
         worst_hold_vio.insert(0, "WNS hold")
         hold_times.insert(0, "TNS hold")
+
+        clock_qor.insert(0, column_labels_clock_qor)
+        clock_qor = pd.DataFrame(clock_qor)
+        clock_qor = clock_qor.transpose()
+        clock_qor = clock_qor.values.tolist()
         report_qor = [current_stage, timing_paths, wns_times, tns_times, 
                         worst_hold_vio, hold_times]
-
+        for row in clock_qor:
+            report_qor.append(row)
         report_qor = pd.DataFrame(report_qor)
 
         print(report_qor)
