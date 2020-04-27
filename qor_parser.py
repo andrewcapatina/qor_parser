@@ -17,6 +17,9 @@ total_hold_violation_str = 'Total Hold Violation:'
 total_neg_slack_str = 'Total Negative Slack:'
 wns_str = 'Critical Path Slack:'
 
+# Variable for different stages in the ASIC design flow. 
+stages= ['synth', 'place', 'cts', 'post-cts', 'route', 'pt']
+
 # Labels used for columns of clock_qor report.
 column_labels_clock_qor = [ 'Sinks', 'Levels', 'Clock Repeater Count',
                             'Clock Repeater Area', 'Clock Stdcell Area', 'Max Latency',
@@ -199,49 +202,55 @@ def format_clock_qor_data(clock_qor, timing_paths):
 def main():
     top_design = input("Please specify a top design. String only.\n")
    
-    stages= ['syn', 'cts']
     reports=[]
     for stage in stages:
 
+        # Read qor report.
         to_open = top_design + "." + stage + ".qor.rpt"
         print("Parsing file " + to_open)
         qor_report = read_file(to_open)
+
+        # Get all important values from qor report.
         timing_paths = get_timing_paths(qor_report)
         wns_times = get_wns(qor_report)
         tns_times = get_tns(qor_report)
         worst_hold_vio = get_worst_hold_violation(qor_report)
         hold_times = get_hold_times(qor_report)
 
-
+        # Read clock_qor report.
         to_open = top_design + "." + stage + ".clock_qor.rpt"
         print("Parsing file " + to_open)
         clock_qor = read_file(to_open)
-        clock_qor = parse_clock_qor(clock_qor)
 
+        # Parse and format the clock_qor report.
+        clock_qor = parse_clock_qor(clock_qor)
         clock_qor = format_clock_qor_data(clock_qor, timing_paths)
 
+        # Prepend labels to data.
         current_stage = ["Stage: " + stage]
         timing_paths.insert(0, " ")
-        wns_times.insert(0, "WNS Setup.")
-        tns_times.insert(0, "TNS Setup.")
-        worst_hold_vio.insert(0, "WNS hold")
-        hold_times.insert(0, "TNS hold")
+        wns_times.insert(0, "WNS Setup")
+        tns_times.insert(0, "TNS Setup")
+        worst_hold_vio.insert(0, "WNS Hold")
+        hold_times.insert(0, "TNS Hold")
 
+        # Prepend labels to data, and transpose the list so 
+        # data remains in proper order. 
         clock_qor.insert(0, column_labels_clock_qor)
         clock_qor = pd.DataFrame(clock_qor)
         clock_qor = clock_qor.transpose()
         clock_qor = clock_qor.values.tolist()
+
+        # Combine all the data together. 
         report_qor = [current_stage, timing_paths, wns_times, tns_times, 
                         worst_hold_vio, hold_times]
         for row in clock_qor:
             report_qor.append(row)
-        report_qor = pd.DataFrame(report_qor)
 
-        print(report_qor)
+
+        report_qor = pd.DataFrame(report_qor)
         report_qor = report_qor.transpose()
         reports.append(report_qor)
-
-        print(report_qor)
 
 
     write_qor_to_csv(to_open, reports)
