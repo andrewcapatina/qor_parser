@@ -18,7 +18,7 @@ total_neg_slack_str = 'Total Negative Slack:'
 wns_str = 'Critical Path Slack:'
 
 # Labels used for columns of clock_qor report.
-column_labels_clock_qor = ['Clock/Skew Group', 'Attrs', 'Sinks', 'Levels', 'Clock Repeater Count',
+column_labels_clock_qor = [ 'Sinks', 'Levels', 'Clock Repeater Count',
                             'Clock Repeater Area', 'Clock Stdcell Area', 'Max Latency',
                             'Global Skew', 'Trans DRC Count', 'Cap DRC Count']
 
@@ -174,16 +174,24 @@ def write_qor_to_csv(file_path, reports):
 
 def format_clock_qor_data(clock_qor, timing_paths):
     """
+        Function to remove any unneeded elements from 
+        the clock_qor data set. 
 
+        input: clock_qor: list containing clock_qor report.
+        input: timing_paths: list containing all clock signals in design.
+
+        output: list containing rows of information to be printed to CSV. 
     """
     output = []
     flag = False
     for timing_path in timing_paths:
         for row in clock_qor:
             if row[0] == timing_path:
+                row = row[2:]
                 output.append(row)
                 flag = True
         if flag == False:
+            row = row[2:]
             output.append(['-'])
         flag = False
     return output
