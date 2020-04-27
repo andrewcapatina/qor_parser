@@ -1,0 +1,7 @@
+Stage: cts, ,WNS Setup.,TNS Setup.,WNS hold,TNS hold
+,PCI_CLK,-0.04,-0.07,0.00,0.00
+,v_PCI_CLK,0.52,0.00,0.00,0.00
+,SYS_2x_CLK,-0.24,-2.38,0.00,0.00
+,SYS_CLK,-1.56,-78.10,0.00,0.00
+,SDRAM_CLK,-0.24,-2.80,-2.79,-161.57
+,SD_DDR_CLK,-2.82,-108.91,0.00,0.00

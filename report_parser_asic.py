@@ -5,7 +5,8 @@
         list with values to be loaded into an excel spreadsheet. 
 """
 
-import glob
+import pandas as pd
+import os
 import csv
 
 
@@ -168,42 +169,57 @@ def write_qor_to_csv(file_path, reports):
         Function to write the argument in a CSV file.
         input: print_row: list of lists containing timing and header information.
     """
+    
     with open(file_path + '_parsed.csv', 'w') as csvfile:
         qor_writer = csv.writer(csvfile)
         for report in reports:
+            report = report.values.tolist()
             for row in report:
                 qor_writer.writerow(row)
 
-
 def main():
-    top_design = input("Please specify a top design. String only.")
-    for file_path in glob.glob(top_design + ".*.qor.rpt"):
+    top_design = input("Please specify a top design. String only.\n")
+   
+    stages= ['syn', 'cts']
+    reports=[]
+    for stage in stages:
 
-        print("Parsing file " + file_path)
-        qor_report = read_file(file_path)
+        to_open = top_design + "." + stage + ".qor.rpt"
+        print("Parsing file " + to_open)
+        qor_report = read_file(to_open)
         timing_paths = get_timing_paths(qor_report)
         wns_times = get_wns(qor_report)
         tns_times = get_tns(qor_report)
         worst_hold_vio = get_worst_hold_violation(qor_report)
         hold_times = get_hold_times(qor_report)
 
-        timing_paths.insert(0,' ')
-        wns_times.insert(0, wns_str)
-        tns_times.insert(0, total_neg_slack_str)
-        worst_hold_vio.insert(0, hold_violation_str)
-        hold_times.insert(0, total_hold_violation_str)
-        report_qor = [timing_paths, wns_times, tns_times, 
-                     worst_hold_vio, hold_times]
-        
-    for file_path in glob.glob(top_design + ".*.clock_qor.rpt"):
-        print("Parsing file " + file_path)
-        qor_report = []
-        qor_report = read_file(file_path)
-        clock_qor = parse_clock_qor(qor_report)
-        clock_qor.insert(1, column_labels_clock_qor)
 
-    print_row = [report_qor,clock_qor]
-    write_qor_to_csv(file_path, print_row)
+#        to_open = top_design + "." + stage + ".clock_qor.rpt"
+#        print("Parsing file " + to_open)
+#        clock_qor = read_file(to_open)
+#        clock_qor = parse_clock_qor(clock_qor)
+#        clock_qor.insert(1, column_labels_clock_qor)
+#       print(pd.DataFrame(clock_qor))
+
+        current_stage = ["Stage: " + stage]
+        timing_paths.insert(0, " ")
+        wns_times.insert(0, "WNS Setup.")
+        tns_times.insert(0, "TNS Setup.")
+        worst_hold_vio.insert(0, "WNS hold")
+        hold_times.insert(0, "TNS hold")
+        report_qor = [current_stage, timing_paths, wns_times, tns_times, 
+                        worst_hold_vio, hold_times]
+
+        report_qor = pd.DataFrame(report_qor)
+
+        print(report_qor)
+        report_qor = report_qor.transpose()
+        reports.append(report_qor)
+
+        print(report_qor)
+
+
+    write_qor_to_csv(to_open, reports)
 
 
 if __name__ == "__main__":
