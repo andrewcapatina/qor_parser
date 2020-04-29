@@ -10,10 +10,8 @@ import os
 import csv
 import time
 
-# Variable for location of folder containing 
-# reports to be parsed. 
-FOLDER_READ_PATH = "reports/"  
-FOLDER_WRITE_PATH = "outputs/"
+FOLDER_READ_PATH = "reports/"       # Location of reports to be parsed.
+FOLDER_WRITE_PATH = "outputs/"      # Location of the output parsed file.
 
 # Update the below global variables if qor.rpt or clock_qor.rpt
 # file reporting format changes. 
@@ -23,7 +21,7 @@ total_neg_slack_str = 'Total Negative Slack:'
 wns_str = 'Critical Path Slack:'
 
 # Variable for different stages in the ASIC design flow. 
-stages= ['synth']#, 'place', 'cts', 'post-cts', 'route', 'pt']
+stages= ['synth', 'place', 'cts', 'post-cts', 'route', 'pt']
 
 # Labels used for columns of clock_qor report.
 column_labels_clock_qor = [ 'Sinks', 'Levels', 'Clock Repeater Count',
@@ -161,7 +159,6 @@ def read_file(file_path):
         input: file_path - file path to qor files.
         output: qor_report - file contents returned.
     """
-    print(file_path)
     with open(FOLDER_READ_PATH + file_path) as fp:
         qor_report = fp.readlines()
 
@@ -170,7 +167,11 @@ def read_file(file_path):
 
 def write_qor_to_csv(top_design, reports):
     """
+        Function to write results from all 
+        stages to a CSV file.
 
+        input: top_design: string containing design name.
+        input: reports: list containing data to be printed.
     """
     
     with open(FOLDER_WRITE_PATH + top_design + '_reports_parsed.csv', 'w') as csvfile:
@@ -179,6 +180,7 @@ def write_qor_to_csv(top_design, reports):
             report = report.values.tolist()
             for row in report:
                 qor_writer.writerow(row)
+
 
 def format_clock_qor_data(clock_qor, timing_paths):
     """
@@ -203,6 +205,7 @@ def format_clock_qor_data(clock_qor, timing_paths):
             output.append(['-'])
         flag = False
     return output
+
 
 def main():
     top_design = input("Please specify a top design. String only.\n")
@@ -252,7 +255,7 @@ def main():
             report_qor.append(row)
 
 
-        report_qor = pd.DataFrame(report_qor)
+        report_qor = pd.DataFrame(report_qor)   # Transposing the data for viewability.
         report_qor = report_qor.transpose()
         reports.append(report_qor)
 
