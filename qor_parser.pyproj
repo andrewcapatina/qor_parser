@@ -26,6 +26,18 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="ORCA_TOP.cts2.qor.rpt" />
+    <Content Include="reports\fifo1.cts2.clock_qor.rpt" />
+    <Content Include="reports\fifo1.cts2.qor.rpt" />
+    <Content Include="reports\ORCA_TOP.cts.clock_qor.rpt" />
+    <Content Include="reports\ORCA_TOP.cts.qor.rpt" />
+    <Content Include="reports\ORCA_TOP.place.clock_qor.rpt" />
+    <Content Include="reports\ORCA_TOP.place.qor.rpt" />
+    <Content Include="reports\ORCA_TOP.synth.clock_qor.rpt" />
+    <Content Include="reports\ORCA_TOP.synth.qor.rpt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="outputs\" />
+    <Folder Include="reports\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

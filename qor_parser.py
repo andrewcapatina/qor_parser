@@ -8,7 +8,12 @@
 import pandas as pd
 import os
 import csv
+import time
 
+# Variable for location of folder containing 
+# reports to be parsed. 
+FOLDER_READ_PATH = "reports/"  
+FOLDER_WRITE_PATH = "outputs/"
 
 # Update the below global variables if qor.rpt or clock_qor.rpt
 # file reporting format changes. 
@@ -18,7 +23,7 @@ total_neg_slack_str = 'Total Negative Slack:'
 wns_str = 'Critical Path Slack:'
 
 # Variable for different stages in the ASIC design flow. 
-stages= ['synth', 'place', 'cts', 'post-cts', 'route', 'pt']
+stages= ['synth']#, 'place', 'cts', 'post-cts', 'route', 'pt']
 
 # Labels used for columns of clock_qor report.
 column_labels_clock_qor = [ 'Sinks', 'Levels', 'Clock Repeater Count',
@@ -156,19 +161,19 @@ def read_file(file_path):
         input: file_path - file path to qor files.
         output: qor_report - file contents returned.
     """
-    with open(file_path) as fp:
+    print(file_path)
+    with open(FOLDER_READ_PATH + file_path) as fp:
         qor_report = fp.readlines()
 
     return qor_report
 
 
-def write_qor_to_csv(file_path, reports):
+def write_qor_to_csv(top_design, reports):
     """
-        Function to write the argument in a CSV file.
-        input: print_row: list of lists containing timing and header information.
+
     """
     
-    with open(file_path + '_parsed.csv', 'w') as csvfile:
+    with open(FOLDER_WRITE_PATH + top_design + '_reports_parsed.csv', 'w') as csvfile:
         qor_writer = csv.writer(csvfile)
         for report in reports:
             report = report.values.tolist()
@@ -205,8 +210,7 @@ def main():
     reports=[]
     for stage in stages:
 
-        # Read qor report.
-        to_open = top_design + "." + stage + ".qor.rpt"
+        to_open = top_design + "." + stage + ".qor.rpt"       
         print("Parsing file " + to_open)
         qor_report = read_file(to_open)
 
@@ -253,7 +257,7 @@ def main():
         reports.append(report_qor)
 
 
-    write_qor_to_csv(to_open, reports)
+    write_qor_to_csv(top_design, reports)
 
 
 if __name__ == "__main__":
